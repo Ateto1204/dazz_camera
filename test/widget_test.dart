@@ -4,26 +4,55 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:dazz_camera_ui/main.dart';
 
 void main() {
-  testWidgets('filter picker updates preview when a filter is tapped', (
+  testWidgets('home page does not overflow on short screens', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.binding.setSurfaceSize(const Size(375, 667));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    expect(find.text('Dazz Camera'), findsOneWidget);
-
-    final selectedFilterName = find.byKey(
-      const ValueKey('selected-filter-name'),
-    );
-
-    expect(selectedFilterName, findsOneWidget);
-    expect(tester.widget<Text>(selectedFilterName).data, 'Original');
-
-    final vintageFilterTile = find.byKey(const ValueKey('filter-item-vintage'));
-
-    await tester.ensureVisible(vintageFilterTile);
-    await tester.tap(vintageFilterTile);
+    await tester.pumpWidget(const DazzPrototypeApp());
     await tester.pumpAndSettle();
 
-    expect(tester.widget<Text>(selectedFilterName).data, 'Vintage');
+    expect(tester.takeException(), isNull);
+    expect(
+      find.byKey(const ValueKey('selected-camera-option-name')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('camera menu confirm updates the home preview', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const DazzPrototypeApp());
+
+    final selectedOptionName = find.byKey(
+      const ValueKey('selected-camera-option-name'),
+    );
+
+    expect(selectedOptionName, findsOneWidget);
+    expect(tester.widget<Text>(selectedOptionName).data, 'Classic');
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('open-camera-menu-button')),
+    );
+    await tester.tap(find.byKey(const ValueKey('open-camera-menu-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Camera Menu'), findsOneWidget);
+
+    final dazzOption = find.byKey(const ValueKey('camera-option-item-dazz'));
+    await tester.tap(dazzOption);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('confirm-camera-option-button')),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('confirm-camera-option-button')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Text>(selectedOptionName).data, 'Dazz');
   });
 }
