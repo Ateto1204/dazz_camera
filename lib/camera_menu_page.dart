@@ -89,7 +89,7 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
                   ),
                 ),
                 onPressed: _confirmSelection,
-                child: Text('Confirm ${_selectedOption.name}'),
+                child: Text('Confirm ${_selectedOption.title}'),
               ),
             ),
           ],
@@ -170,7 +170,7 @@ class _CameraOptionCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    option.name.substring(0, 1),
+                    option.title.substring(0, 1),
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
@@ -183,7 +183,7 @@ class _CameraOptionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      option.name,
+                      option.title,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),

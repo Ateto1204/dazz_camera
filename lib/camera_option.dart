@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CameraOption {
   const CameraOption({
     required this.id,
-    required this.name,
+    required this.title,
     required this.previewLabel,
     required this.description,
     required this.accentColor,
@@ -11,7 +11,7 @@ class CameraOption {
   });
 
   final String id;
-  final String name;
+  final String title;
   final String previewLabel;
   final String description;
   final Color accentColor;
@@ -21,7 +21,7 @@ class CameraOption {
 const cameraOptions = <CameraOption>[
   CameraOption(
     id: 'classic',
-    name: 'Classic',
+    title: 'Classic',
     previewLabel: 'STANDARD LOOK',
     description: 'Balanced tone with a clean camera preview feel.',
     accentColor: Color(0xFFE2E5EA),
@@ -29,7 +29,7 @@ const cameraOptions = <CameraOption>[
   ),
   CameraOption(
     id: 'dazz',
-    name: 'Dazz',
+    title: 'Dazz',
     previewLabel: 'DAZZ SOFTLIGHT',
     description: 'Warm highlight bloom with a nostalgic handheld mood.',
     accentColor: Color(0xFFF0A25A),
@@ -37,7 +37,7 @@ const cameraOptions = <CameraOption>[
   ),
   CameraOption(
     id: 'vintage',
-    name: 'Vintage',
+    title: 'Vintage',
     previewLabel: 'AGED FILM',
     description: 'Muted brown tones and softer contrast for an old film look.',
     accentColor: Color(0xFFC3936A),
@@ -45,7 +45,7 @@ const cameraOptions = <CameraOption>[
   ),
   CameraOption(
     id: 'mono',
-    name: 'Mono',
+    title: 'Mono',
     previewLabel: 'BLACK & WHITE',
     description: 'Neutral grayscale styling with stronger structure.',
     accentColor: Color(0xFFB2B2B2),
@@ -53,7 +53,7 @@ const cameraOptions = <CameraOption>[
   ),
   CameraOption(
     id: 'warm',
-    name: 'Warm',
+    title: 'Warm',
     previewLabel: 'SUNSET GLOW',
     description: 'Richer orange-red hues with a brighter center tone.',
     accentColor: Color(0xFFE67854),
@@ -61,7 +61,7 @@ const cameraOptions = <CameraOption>[
   ),
   CameraOption(
     id: 'cool',
-    name: 'Cool',
+    title: 'Cool',
     previewLabel: 'COOL SHIFT',
     description: 'Blue-tinted styling with a cleaner digital mood.',
     accentColor: Color(0xFF71A9F3),
@@ -69,7 +69,7 @@ const cameraOptions = <CameraOption>[
   ),
   CameraOption(
     id: 'dreamy',
-    name: 'Dreamy',
+    title: 'Dreamy',
     previewLabel: 'DREAM HAZE',
     description: 'Soft lilac glow with a slightly misty preview card.',
     accentColor: Color(0xFFC99FE8),
@@ -77,7 +77,7 @@ const cameraOptions = <CameraOption>[
   ),
   CameraOption(
     id: 'film',
-    name: 'Film',
+    title: 'Film',
     previewLabel: 'FILM STOCK',
     description: 'Green-brown mood with a subtle analog atmosphere.',
     accentColor: Color(0xFF7CB184),

@@ -15,7 +15,11 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(
-      find.byKey(const ValueKey('selected-camera-option-name')),
+      find.byKey(const ValueKey('selected-camera-option-title')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('open-camera-menu-button')),
       findsOneWidget,
     );
   });
@@ -25,12 +29,12 @@ void main() {
   ) async {
     await tester.pumpWidget(const DazzPrototypeApp());
 
-    final selectedOptionName = find.byKey(
-      const ValueKey('selected-camera-option-name'),
+    final selectedOptionTitle = find.byKey(
+      const ValueKey('selected-camera-option-title'),
     );
 
-    expect(selectedOptionName, findsOneWidget);
-    expect(tester.widget<Text>(selectedOptionName).data, 'Classic');
+    expect(selectedOptionTitle, findsOneWidget);
+    expect(tester.widget<Text>(selectedOptionTitle).data, 'Classic');
 
     await tester.ensureVisible(
       find.byKey(const ValueKey('open-camera-menu-button')),
@@ -53,6 +57,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(tester.widget<Text>(selectedOptionName).data, 'Dazz');
+    expect(tester.widget<Text>(selectedOptionTitle).data, 'Dazz');
   });
 }
