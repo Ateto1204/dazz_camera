@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:dazz_camera_ui/camera_menu_page.dart';
 import 'package:dazz_camera_ui/camera_option.dart';
@@ -51,6 +52,10 @@ class _MenuNavigationHarnessState extends State<_MenuNavigationHarness> {
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   test('app widget can be created', () {
     expect(const DazzPrototypeApp(), isA<Widget>());
   });
@@ -130,7 +135,7 @@ void main() {
     expect(find.text('Overview'), findsOneWidget);
     expect(find.text('Features'), findsOneWidget);
     expect(find.text('Best For'), findsOneWidget);
-    expect(find.text('Back'), findsOneWidget);
+    expect(find.text('Back'), findsNothing);
 
     await tester.tap(find.byKey(const ValueKey('language-toggle-TW')));
     await tester.pumpAndSettle();
@@ -138,7 +143,34 @@ void main() {
     expect(find.text('簡介'), findsOneWidget);
     expect(find.text('特色'), findsOneWidget);
     expect(find.text('適合場景'), findsOneWidget);
-    expect(find.text('返回'), findsOneWidget);
+    expect(find.text('Back'), findsNothing);
+  });
+
+  testWidgets('detail language selection persists across reopen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(home: CameraMenuPage(initialOption: cameraOptions.first)),
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('camera-option-item-sony-handycam-1')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('detail-camera-option-button')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('language-toggle-TW')));
+    await tester.pumpAndSettle();
+    expect(find.text('簡介'), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('detail-camera-option-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('簡介'), findsOneWidget);
+    expect(find.text('特色'), findsOneWidget);
   });
 
   testWidgets(

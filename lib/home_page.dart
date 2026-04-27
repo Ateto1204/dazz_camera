@@ -275,12 +275,12 @@ class _CameraPreviewCard extends StatelessWidget {
             else if (isInitializing)
               const _PreviewMessage(
                 icon: Icons.camera_alt_outlined,
-                title: 'Initializing camera...',
+                title: 'DAZZ CAMERA',
               )
             else
-              _PreviewMessage(
+              const _PreviewMessage(
                 icon: Icons.error_outline_rounded,
-                title: errorMessage ?? 'Camera preview unavailable.',
+                title: 'DAZZ CAMERA',
               ),
             Positioned(
               top: 16,

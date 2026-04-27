@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'camera_detail_content.dart';
 import 'camera_option.dart';
@@ -13,7 +14,46 @@ class CameraDetailPage extends StatefulWidget {
 }
 
 class _CameraDetailPageState extends State<CameraDetailPage> {
+  static const _languagePreferenceKey = 'camera_detail_language';
   DetailLanguage _language = DetailLanguage.en;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedLanguage();
+  }
+
+  Future<void> _loadSavedLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedLanguage = prefs.getString(_languagePreferenceKey);
+    final language = savedLanguage == 'tw'
+        ? DetailLanguage.tw
+        : DetailLanguage.en;
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _language = language;
+    });
+  }
+
+  Future<void> _setLanguage(DetailLanguage language) async {
+    if (_language == language) {
+      return;
+    }
+
+    setState(() {
+      _language = language;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _languagePreferenceKey,
+      language == DetailLanguage.tw ? 'tw' : 'en',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +76,7 @@ class _CameraDetailPageState extends State<CameraDetailPage> {
             child: _LanguageToggle(
               isTw: isTw,
               onChanged: (value) {
-                setState(() {
-                  _language = value ? DetailLanguage.tw : DetailLanguage.en;
-                });
+                _setLanguage(value ? DetailLanguage.tw : DetailLanguage.en);
               },
             ),
           ),
@@ -46,73 +84,42 @@ class _CameraDetailPageState extends State<CameraDetailPage> {
       ),
       body: SafeArea(
         top: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _HeroSection(
-                      option: widget.option,
-                      tagline: content.tagline,
-                    ),
-                    const SizedBox(height: 24),
-                    _SectionTitle(title: isTw ? '簡介' : 'Overview'),
-                    const SizedBox(height: 10),
-                    Text(
-                      content.overview,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.86),
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    _SectionTitle(title: isTw ? '特色' : 'Features'),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: content.features
-                          .map((feature) => _FeatureChip(label: feature))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 24),
-                    _SectionTitle(title: isTw ? '適合場景' : 'Best For'),
-                    const SizedBox(height: 12),
-                    Column(
-                      children: content.bestFor
-                          .map((item) => _BestForItem(label: item))
-                          .toList(),
-                    ),
-                  ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _HeroSection(option: widget.option, tagline: content.tagline),
+              const SizedBox(height: 24),
+              _SectionTitle(title: isTw ? '簡介' : 'Overview'),
+              const SizedBox(height: 10),
+              Text(
+                content.overview,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.86),
+                  height: 1.5,
                 ),
               ),
-            ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                    child: Text(
-                      isTw ? '返回' : 'Back',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                ),
+              const SizedBox(height: 24),
+              _SectionTitle(title: isTw ? '特色' : 'Features'),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: content.features
+                    .map((feature) => _FeatureChip(label: feature))
+                    .toList(),
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+              _SectionTitle(title: isTw ? '適合場景' : 'Best For'),
+              const SizedBox(height: 12),
+              Column(
+                children: content.bestFor
+                    .map((item) => _BestForItem(label: item))
+                    .toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );
