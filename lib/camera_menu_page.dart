@@ -57,18 +57,23 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
                 onTap: _handleOptionTap,
               ),
               const Spacer(),
-              FilledButton(
-                key: const ValueKey('apply-camera-option-button'),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(52),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
+              Center(
+                child: SizedBox(
+                  width: 132,
+                  child: FilledButton(
+                    key: const ValueKey('apply-camera-option-button'),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(46),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: _applySelection,
+                    child: const Text(
+                      'Apply',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   ),
-                ),
-                onPressed: _applySelection,
-                child: const Text(
-                  'Apply',
-                  style: TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),
             ],
@@ -94,22 +99,38 @@ class _OptionScrollerRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 138,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        itemCount: options.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final option = options[index];
-
-          return SizedBox(
-            width: 104,
-            child: _CameraOptionTile(
-              key: ValueKey('camera-option-item-${option.id}'),
-              option: option,
-              isSelected: option.id == selectedOption.id,
-              onTap: () => onTap(option),
+      height: 128,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: constraints.maxWidth),
+              child: Align(
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < options.length; i++) ...[
+                      SizedBox(
+                        width: 82,
+                        height: 120,
+                        child: _CameraOptionTile(
+                          key: ValueKey(
+                            'camera-option-item-${options[i].id}-$i',
+                          ),
+                          option: options[i],
+                          isSelected: options[i].id == selectedOption.id,
+                          onTap: () => onTap(options[i]),
+                        ),
+                      ),
+                      if (i != options.length - 1) const SizedBox(width: 12),
+                    ],
+                  ],
+                ),
+              ),
             ),
           );
         },
@@ -133,102 +154,76 @@ class _CameraOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isEnabled = option.isImplemented;
 
     return Opacity(
-      opacity: option.isImplemented ? 1 : 0.58,
+      opacity: isSelected ? 1 : 0.58,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: option.isImplemented ? onTap : null,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  width: 104,
-                  height: 104,
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.08),
-                      width: isSelected ? 2.2 : 1,
+          borderRadius: BorderRadius.circular(16),
+          onTap: isEnabled ? onTap : null,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 58,
+                    height: 58,
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.08),
+                        width: isSelected ? 2.2 : 1,
+                      ),
                     ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              blurRadius: 18,
-                              offset: const Offset(0, 8),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: option.colors,
-                            ),
-                          ),
-                          child: Image.asset(
-                            option.thumbnailAssetPath,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        if (!option.isImplemented)
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.32),
-                            ),
-                          ),
-                        if (isSelected)
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: Container(
-                              width: 22,
-                              height: 22,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.45),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.18),
+                    child: ClipOval(
+                      child: option.iconData != null
+                          ? Center(
+                              child: Icon(
+                                option.iconData,
+                                size: 26,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.white70,
+                              ),
+                            )
+                          : Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.asset(
+                                  option.thumbnailAssetPath!,
+                                  fit: BoxFit.cover,
                                 ),
-                              ),
-                              child: const Icon(
-                                Icons.check,
-                                size: 14,
-                                color: Colors.white,
-                              ),
+                                if (!isEnabled)
+                                  ColoredBox(
+                                    color: Colors.black.withValues(alpha: 0.32),
+                                  ),
+                              ],
                             ),
-                          ),
-                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  option.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                    color: option.isImplemented ? Colors.white : Colors.white70,
+                  const SizedBox(height: 6),
+                  Text(
+                    option.title,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
+                      color: isEnabled ? Colors.white : Colors.white70,
+                      fontSize: 11,
+                      height: 1.1,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -19,7 +19,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('recording-options-row')), findsOneWidget);
     expect(find.byKey(const ValueKey('capture-options-row')), findsOneWidget);
-    expect(find.text('Original'), findsOneWidget);
+    expect(find.text('Original'), findsNWidgets(2));
     expect(
       find.byKey(const ValueKey('apply-camera-option-button')),
       findsOneWidget,

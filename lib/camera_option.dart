@@ -6,7 +6,8 @@ class CameraOption {
     required this.title,
     required this.previewLabel,
     required this.colors,
-    required this.thumbnailAssetPath,
+    this.thumbnailAssetPath,
+    this.iconData,
     this.isImplemented = false,
   });
 
@@ -14,19 +15,22 @@ class CameraOption {
   final String title;
   final String previewLabel;
   final List<Color> colors;
-  final String thumbnailAssetPath;
+  final String? thumbnailAssetPath;
+  final IconData? iconData;
   final bool isImplemented;
 }
 
+const originalCameraOption = CameraOption(
+  id: 'original',
+  title: 'Original',
+  previewLabel: 'STANDARD LOOK',
+  colors: [Color(0xFFE5E8EC), Color(0xFF6A7480), Color(0xFF111418)],
+  iconData: Icons.camera_alt_outlined,
+  isImplemented: true,
+);
+
 const recordingCameraOptions = <CameraOption>[
-  CameraOption(
-    id: 'original',
-    title: 'Original',
-    previewLabel: 'STANDARD LOOK',
-    colors: [Color(0xFFE5E8EC), Color(0xFF6A7480), Color(0xFF111418)],
-    thumbnailAssetPath: 'assets/images/recording/Canon VIXIA.png',
-    isImplemented: true,
-  ),
+  originalCameraOption,
   CameraOption(
     id: 'sony-handycam',
     title: 'Sony Handycam',
@@ -51,6 +55,7 @@ const recordingCameraOptions = <CameraOption>[
 ];
 
 const captureCameraOptions = <CameraOption>[
+  originalCameraOption,
   CameraOption(
     id: 'canon-dslr',
     title: 'Canon DSLR',
@@ -88,7 +93,8 @@ const captureCameraOptions = <CameraOption>[
   ),
 ];
 
-const cameraOptions = <CameraOption>[
-  ...recordingCameraOptions,
-  ...captureCameraOptions,
+final cameraOptions = <CameraOption>[
+  originalCameraOption,
+  ...recordingCameraOptions.skip(1),
+  ...captureCameraOptions.skip(1),
 ];
