@@ -34,7 +34,7 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
   Future<void> _openDetailPage() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => CameraDetailPage(title: _selectedOption.title),
+        builder: (_) => CameraDetailPage(option: _selectedOption),
       ),
     );
   }
@@ -44,9 +44,15 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
     final canApply = _selectedOption.id == originalCameraOption.id;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
