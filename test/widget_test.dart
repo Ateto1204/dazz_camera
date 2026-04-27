@@ -73,9 +73,13 @@ void main() {
       find.byKey(const ValueKey('apply-camera-option-button')),
       findsOneWidget,
     );
+    final detailButton = tester.widget<OutlinedButton>(
+      find.byKey(const ValueKey('detail-camera-option-button')),
+    );
     final applyButton = tester.widget<FilledButton>(
       find.byKey(const ValueKey('apply-camera-option-button')),
     );
+    expect(detailButton.onPressed, isNull);
     expect(applyButton.onPressed, isNotNull);
     expect(find.text('Apply'), findsOneWidget);
     expect(find.text('Detail'), findsOneWidget);
@@ -95,9 +99,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      final detailButton = tester.widget<OutlinedButton>(
+        find.byKey(const ValueKey('detail-camera-option-button')),
+      );
       final applyButton = tester.widget<FilledButton>(
         find.byKey(const ValueKey('apply-camera-option-button')),
       );
+      expect(detailButton.onPressed, isNotNull);
       expect(applyButton.onPressed, isNull);
     },
   );
@@ -123,6 +131,14 @@ void main() {
     expect(find.text('Features'), findsOneWidget);
     expect(find.text('Best For'), findsOneWidget);
     expect(find.text('Back'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('language-toggle-TW')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('簡介'), findsOneWidget);
+    expect(find.text('特色'), findsOneWidget);
+    expect(find.text('適合場景'), findsOneWidget);
+    expect(find.text('返回'), findsOneWidget);
   });
 
   testWidgets(
@@ -174,6 +190,10 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: _MenuNavigationHarness()));
 
     await tester.tap(find.byKey(const ValueKey('open-menu-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('camera-option-item-sony-handycam-1')),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('detail-camera-option-button')));
     await tester.pumpAndSettle();

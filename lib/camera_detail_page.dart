@@ -3,15 +3,24 @@ import 'package:flutter/material.dart';
 import 'camera_detail_content.dart';
 import 'camera_option.dart';
 
-class CameraDetailPage extends StatelessWidget {
+class CameraDetailPage extends StatefulWidget {
   const CameraDetailPage({super.key, required this.option});
 
   final CameraOption option;
 
   @override
+  State<CameraDetailPage> createState() => _CameraDetailPageState();
+}
+
+class _CameraDetailPageState extends State<CameraDetailPage> {
+  DetailLanguage _language = DetailLanguage.en;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final content = detailContentFor(option);
+    final bundle = detailContentFor(widget.option);
+    final content = bundle.contentFor(_language);
+    final isTw = _language == DetailLanguage.tw;
 
     return Scaffold(
       appBar: AppBar(
@@ -21,6 +30,19 @@ class CameraDetailPage extends StatelessWidget {
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         title: const Text('Camera Detail'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: _LanguageToggle(
+              isTw: isTw,
+              onChanged: (value) {
+                setState(() {
+                  _language = value ? DetailLanguage.tw : DetailLanguage.en;
+                });
+              },
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         top: false,
@@ -32,9 +54,12 @@ class CameraDetailPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _HeroSection(option: option, tagline: content.tagline),
+                    _HeroSection(
+                      option: widget.option,
+                      tagline: content.tagline,
+                    ),
                     const SizedBox(height: 24),
-                    _SectionTitle(title: 'Overview'),
+                    _SectionTitle(title: isTw ? '簡介' : 'Overview'),
                     const SizedBox(height: 10),
                     Text(
                       content.overview,
@@ -44,7 +69,7 @@ class CameraDetailPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _SectionTitle(title: 'Features'),
+                    _SectionTitle(title: isTw ? '特色' : 'Features'),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 10,
@@ -54,7 +79,7 @@ class CameraDetailPage extends StatelessWidget {
                           .toList(),
                     ),
                     const SizedBox(height: 24),
-                    _SectionTitle(title: 'Best For'),
+                    _SectionTitle(title: isTw ? '適合場景' : 'Best For'),
                     const SizedBox(height: 12),
                     Column(
                       children: content.bestFor
@@ -79,15 +104,84 @@ class CameraDetailPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(18),
                       ),
                     ),
-                    child: const Text(
-                      'Back',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    child: Text(
+                      isTw ? '返回' : 'Back',
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageToggle extends StatelessWidget {
+  const _LanguageToggle({required this.isTw, required this.onChanged});
+
+  final bool isTw;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: const Color(0xFF171717),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _LanguageToggleButton(
+            label: 'TW',
+            selected: isTw,
+            onTap: () => onChanged(true),
+          ),
+          _LanguageToggleButton(
+            label: 'EN',
+            selected: !isTw,
+            onTap: () => onChanged(false),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LanguageToggleButton extends StatelessWidget {
+  const _LanguageToggleButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        key: ValueKey('language-toggle-$label'),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.black : Colors.white70,
+            fontWeight: FontWeight.w700,
+            fontSize: 12,
+          ),
         ),
       ),
     );

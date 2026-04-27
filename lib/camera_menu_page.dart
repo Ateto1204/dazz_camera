@@ -42,6 +42,7 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
   @override
   Widget build(BuildContext context) {
     final canApply = _selectedOption.id == originalCameraOption.id;
+    final canViewDetail = _selectedOption.id != originalCameraOption.id;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +85,7 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        onPressed: _openDetailPage,
+                        onPressed: canViewDetail ? _openDetailPage : null,
                         child: const Text(
                           'Detail',
                           style: TextStyle(fontWeight: FontWeight.w700),

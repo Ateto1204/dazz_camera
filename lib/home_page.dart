@@ -133,7 +133,33 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _stopCameraPreview() async {
+    final controller = _cameraController;
+
+    if (controller == null) {
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _cameraController = null;
+        _isInitializing = false;
+      });
+    } else {
+      _cameraController = null;
+    }
+
+    await controller.dispose();
+  }
+
   Future<void> _openCameraMenu() async {
+    final preferredCamera = _cameraDescription;
+
+    await _stopCameraPreview();
+    if (!mounted) {
+      return;
+    }
+
     final result = await Navigator.of(context).push<CameraOption>(
       MaterialPageRoute(
         builder: (_) => CameraMenuPage(initialOption: _selectedOption),
@@ -144,6 +170,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       setState(() {
         _selectedOption = result;
       });
+    }
+
+    if (mounted) {
+      await _initializeCamera(preferredCamera);
     }
   }
 
