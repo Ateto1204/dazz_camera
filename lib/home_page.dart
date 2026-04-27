@@ -231,8 +231,8 @@ class _CameraPreviewCard extends StatelessWidget {
               left: 18,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: 10,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.42),
@@ -245,33 +245,9 @@ class _CameraPreviewCard extends StatelessWidget {
                   'ORIGINAL',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 1.1,
+                    fontSize: 12,
+                    letterSpacing: 0.8,
                   ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 18,
-              right: 18,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.42),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.circle, color: Color(0xFFFF615D), size: 10),
-                    SizedBox(width: 6),
-                    Text('LIVE', style: TextStyle(fontWeight: FontWeight.w700)),
-                  ],
                 ),
               ),
             ),
