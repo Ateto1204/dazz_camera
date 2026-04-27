@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'camera_detail_page.dart';
 import 'camera_option.dart';
 
 class CameraMenuPage extends StatefulWidget {
@@ -21,10 +22,6 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
   }
 
   void _handleOptionTap(CameraOption option) {
-    if (!option.isImplemented) {
-      return;
-    }
-
     setState(() {
       _selectedOption = option;
     });
@@ -34,8 +31,18 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
     Navigator.of(context).pop(_selectedOption);
   }
 
+  Future<void> _openDetailPage() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CameraDetailPage(title: _selectedOption.title),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final canApply = _selectedOption.id == originalCameraOption.id;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -58,22 +65,45 @@ class _CameraMenuPageState extends State<CameraMenuPage> {
               ),
               const Spacer(),
               Center(
-                child: SizedBox(
-                  width: 132,
-                  child: FilledButton(
-                    key: const ValueKey('apply-camera-option-button'),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(46),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 112,
+                      child: OutlinedButton(
+                        key: const ValueKey('detail-camera-option-button'),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(46),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        onPressed: _openDetailPage,
+                        child: const Text(
+                          'Detail',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
                       ),
                     ),
-                    onPressed: _applySelection,
-                    child: const Text(
-                      'Apply',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    const SizedBox(width: 12),
+                    SizedBox(
+                      width: 112,
+                      child: FilledButton(
+                        key: const ValueKey('apply-camera-option-button'),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(46),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        onPressed: canApply ? _applySelection : null,
+                        child: const Text(
+                          'Apply',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],
@@ -154,7 +184,6 @@ class _CameraOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isEnabled = option.isImplemented;
 
     return Opacity(
       opacity: isSelected ? 1 : 0.58,
@@ -162,7 +191,7 @@ class _CameraOptionTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: isEnabled ? onTap : null,
+          onTap: onTap,
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -200,10 +229,6 @@ class _CameraOptionTile extends StatelessWidget {
                                   option.thumbnailAssetPath!,
                                   fit: BoxFit.cover,
                                 ),
-                                if (!isEnabled)
-                                  ColoredBox(
-                                    color: Colors.black.withValues(alpha: 0.32),
-                                  ),
                               ],
                             ),
                     ),
@@ -217,7 +242,7 @@ class _CameraOptionTile extends StatelessWidget {
                       fontWeight: isSelected
                           ? FontWeight.w700
                           : FontWeight.w600,
-                      color: isEnabled ? Colors.white : Colors.white70,
+                      color: Colors.white,
                       fontSize: 11,
                       height: 1.1,
                     ),
