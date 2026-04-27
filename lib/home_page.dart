@@ -1,6 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+import 'camera_menu_page.dart';
+import 'camera_option.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -9,6 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  CameraOption _selectedOption = cameraOptions.first;
   CameraController? _cameraController;
   CameraDescription? _cameraDescription;
   bool _isInitializing = true;
@@ -129,6 +133,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _openCameraMenu() async {
+    final result = await Navigator.of(context).push<CameraOption>(
+      MaterialPageRoute(
+        builder: (_) => CameraMenuPage(initialOption: _selectedOption),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedOption = result;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,15 +166,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 children: [
                   Expanded(
                     child: _CameraPreviewCard(
+                      option: _selectedOption,
                       controller: _cameraController,
                       isInitializing: _isInitializing,
                       errorMessage: _errorMessage,
                     ),
                   ),
-                  SizedBox(height: compact ? 14 : 18),
+                  SizedBox(height: compact ? 10 : 14),
+                  _ParameterControlsBar(compact: compact),
+                  SizedBox(height: compact ? 12 : 16),
                   SizedBox(
                     height: compact ? 92 : 108,
-                    child: _BottomControls(compact: compact),
+                    child: _BottomControls(
+                      compact: compact,
+                      onOpenMenu: _openCameraMenu,
+                    ),
                   ),
                 ],
               ),
@@ -170,11 +194,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
 class _CameraPreviewCard extends StatelessWidget {
   const _CameraPreviewCard({
+    required this.option,
     required this.controller,
     required this.isInitializing,
     required this.errorMessage,
   });
 
+  final CameraOption option;
   final CameraController? controller;
   final bool isInitializing;
   final String? errorMessage;
@@ -227,32 +253,136 @@ class _CameraPreviewCard extends StatelessWidget {
                 title: errorMessage ?? 'Camera preview unavailable.',
               ),
             Positioned(
-              top: 18,
-              left: 18,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.42),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-                child: const Text(
-                  'ORIGINAL',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-              ),
+              top: 16,
+              left: 16,
+              child: _PreviewTitleBadge(title: option.title),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ParameterControlsBar extends StatelessWidget {
+  const _ParameterControlsBar({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: compact ? 38 : 42,
+      width: double.infinity,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: Row(
+          children: [
+            _PreviewValueChip(
+              icon: Icons.thermostat_rounded,
+              label: compact ? 'WB' : 'WB 5200K',
+            ),
+            const SizedBox(width: 8),
+            _PreviewValueChip(label: compact ? 'ISO' : 'ISO 100'),
+            const SizedBox(width: 8),
+            _PreviewValueChip(label: compact ? 'EV' : 'EV 0.0'),
+            const SizedBox(width: 8),
+            _PreviewIconChip(icon: Icons.timer_outlined, compact: compact),
+            const SizedBox(width: 8),
+            _PreviewIconChip(icon: Icons.flash_off_rounded, compact: compact),
+            const SizedBox(width: 8),
+            _PreviewIconChip(
+              icon: Icons.flip_camera_ios_outlined,
+              compact: compact,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PreviewTitleBadge extends StatelessWidget {
+  const _PreviewTitleBadge({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: 11,
+          letterSpacing: 0.7,
+        ),
+      ),
+    );
+  }
+}
+
+class _PreviewIconChip extends StatelessWidget {
+  const _PreviewIconChip({required this.icon, required this.compact});
+
+  final IconData icon;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: compact ? 34 : 38,
+      height: compact ? 34 : 38,
+      decoration: BoxDecoration(
+        color: const Color(0xFF171717),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Icon(icon, color: Colors.white, size: compact ? 17 : 19),
+    );
+  }
+}
+
+class _PreviewValueChip extends StatelessWidget {
+  const _PreviewValueChip({this.icon, required this.label});
+
+  final IconData? icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: const Color(0xFF171717),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 14, color: Colors.white70),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -289,9 +419,10 @@ class _PreviewMessage extends StatelessWidget {
 }
 
 class _BottomControls extends StatelessWidget {
-  const _BottomControls({required this.compact});
+  const _BottomControls({required this.compact, required this.onOpenMenu});
 
   final bool compact;
+  final VoidCallback onOpenMenu;
 
   @override
   Widget build(BuildContext context) {
@@ -306,29 +437,41 @@ class _BottomControls extends StatelessWidget {
         const Spacer(),
         _CaptureButton(size: compact ? 84 : 94),
         const Spacer(),
-        _CircleControl(icon: Icons.camera_alt_outlined, size: sideButtonSize),
+        _CircleControl(
+          icon: Icons.camera_alt_outlined,
+          size: sideButtonSize,
+          onTap: onOpenMenu,
+        ),
       ],
     );
   }
 }
 
 class _CircleControl extends StatelessWidget {
-  const _CircleControl({required this.icon, required this.size});
+  const _CircleControl({required this.icon, required this.size, this.onTap});
 
   final IconData icon;
   final double size;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: const Color(0xFF181818),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Ink(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF181818),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Icon(icon, color: Colors.white, size: size * 0.34),
+        ),
       ),
-      child: Icon(icon, color: Colors.white, size: size * 0.34),
     );
   }
 }
